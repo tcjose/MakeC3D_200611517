@@ -9,7 +9,7 @@ El entorno de desarrollo en el que fue realizado este proyecto está compuesto p
 * CUP 11a
 * git 2.7.4
 
-**Nota:** _Para quienes sean nuevos en git (sistema de control de versiones) les dejamos [esta guía](filimx.github.io/git/)_
+**Nota:** _Para quienes sean nuevos en git (sistema de control de versiones) les dejamos [esta guía](https://filimx.github.io/git/)_
 
 ## ¿Cómo usar este proyecto?
 El proyecto cuenta con dos archivos ejecutables (dos archivos con extensión .java con un método main cada uno), el formulario `Inicio.java` es la aplicación como tal que incluye interfaz gráfica y el proceso de parsear una cadena de entrada; El otro archivo ejecutable es `GeneradorDeCompiladores.java` que, como su nombre lo indica, es la clase encargada de analizar los archivos `lexico.flex` y `sintactico.cup` para generar las clases que componen el parser que estamos diseñando (para correr este archivo basta con colocar el cursor sobre él y presionar Shift + F6.
