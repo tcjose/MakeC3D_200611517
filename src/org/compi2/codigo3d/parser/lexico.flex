@@ -28,7 +28,7 @@ PAR_DER         = ")"
 
 IGUAL           = "=="
 DIFERENTE       = "!="    
-MENORQ          = "<"
+MENORQ         = "<"
 MAYORQ          = ">"
 MENORIGUALQ     = "<="
 MAYORIGUALQ     = ">="
