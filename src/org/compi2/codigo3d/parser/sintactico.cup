@@ -28,8 +28,9 @@ terminal TokenC3D IGUAL, DIFERENTE, MENORQ, MAYORQ, MAYORIGUALQ, MENORIGUALQ;
 terminal String AND, OR, NOT;
 
 // Seccion de no terminales 
-nonterminal NodoC3D inicial, sentencia, expresion;
-nonterminal NodoC3D oprel, relacion, condicion;
+nonterminal NodoC3D inicial, sentencia,oprel,  expresion;  
+nonterminal NodoC3DRel condicion;
+nonterminal  eme, ene;
 
 precedence left OR;
 precedence left AND;
@@ -44,50 +45,56 @@ start with inicial;
 
 inicial     ::= {: ControlC3D.reiniciar(); :} sentencia:sent                
                     {: 
+                        ControlC3D.agregarC3D( sent.getResultadoFinal());
                         RESULT = sent;
-                        ControlC3D.agregarC3D("//Último valor: " + sent.getCad());
                     :}
 ;
-sentencia   ::=  condicion:cond 
+sentencia   ::=  condicion:nodat 
                     {: 
-                        RESULT = cond;
+                        RESULT = nodat;
                     :}
                     | expresion:exp
                     {: 
                         RESULT = exp;
                     :}
 ;
-condicion   ::= condicion:izq OR:or condicion:der
+condicion   ::= condicion:izq OR:or {: 
+                                         ControlC3D.agregarC3D(izq.getEtiquetaFalsa()+" : \n" ); 
+                                    :} condicion:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + or + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        NodoC3DRel nodo = new NodoC3DRel("COND_OR");
+                        nodo.setEtiquetaVerdadera(izq.getEtiquetaVerdadera()+","+ der.getEtiquetaVerdadera() );
+                        nodo.setEtiquetaFalsa(der.getEtiquetaFalsa());
+                        RESULT = nodo;
                     :}
-            | condicion:izq AND:and condicion:der
+            | condicion:izq AND:and {: 
+                                        ControlC3D.agregarC3D(izq.getEtiquetaVerdadera()+" : \n"); 
+                                    :} condicion:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + and + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        NodoC3DRel nodo = new NodoC3DRel("COND_AND");
+                        nodo.setEtiquetaVerdadera(der.getEtiquetaVerdadera());
+                        nodo.setEtiquetaFalsa(izq.getEtiquetaFalsa()+","+der.getEtiquetaFalsa());
+                        RESULT = nodo;
                     :}
-            | NOT:not condicion:cond
+            | NOT:not condicion:nodat
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = "  + not + cond.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        String eti = nodat.getEtiquetaVerdadera();
+                        nodat.setEtiquetaVerdadera(nodat.getEtiquetaFalsa());
+                        nodat.setEtiquetaFalsa(eti);
+                        RESULT = nodat;
                     :}
-            | PAR_IZQ condicion:rel PAR_DER 
+            | PAR_IZQ condicion:nodat PAR_DER 
                     {:
-                        RESULT = rel; 
+                        RESULT =nodat; 
                      :}
             | expresion:izq oprel:op expresion:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + op.getCad() + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                        NodoC3DRel nodo = new NodoC3DRel("");
+                        nodo.setEtiquetaVerdadera(ControlC3D.generaETQ());
+                        nodo.setEtiquetaFalsa(ControlC3D.generaETQ());                       
+                        String c3d = " if ( " + izq.getCad() +" " +op.getCad() +" "+ der.getCad() + ") goto " + nodo.getEtiquetaVerdadera()+ " ;\n  goto "+ nodo.getEtiquetaFalsa() +" ;\n" ;
+                        ControlC3D.agregarC3D(c3d); 
+                        RESULT = nodo;
                     :}
 ;
 
@@ -104,6 +111,8 @@ oprel   ::=  IGUAL
             |   MAYORIGUALQ  
                     {: RESULT = new NodoC3D(">="); :}
             ;
+
+
 
 expresion   ::= expresion:izq MAS expresion:der
                     {: 

@@ -19,6 +19,7 @@ public class ControlC3D {
         temp = 0;
         etiqueta = 0;
         c3d = "";
+        Display.reiniciar();
     }
     
     /**
